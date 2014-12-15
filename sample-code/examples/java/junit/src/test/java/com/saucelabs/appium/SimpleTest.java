@@ -18,10 +18,12 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,16 +46,24 @@ public class SimpleTest {
     @Before
     public void setUp() throws Exception {
         // set up appium
-        File appDir = new File(System.getProperty("user.dir"), "../../../apps/TestApp/build/Release-iphonesimulator");
-        File app = new File(appDir, "TestApp.app");
+        System.out.println("Ruuning Appium Test Client");
+
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
-        capabilities.setCapability("platformVersion", "7.1");
+        capabilities.setCapability("appium-version", "1.0");
         capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("deviceName", "iPhone Simulator");
-        capabilities.setCapability("app", app.getAbsolutePath());
-        driver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
-        values = new ArrayList<Integer>();
+        capabilities.setCapability("platformVersion", "7.1");
+
+        capabilities.setCapability("udid","becfbcdc585a8d9089c7061a43b4054b7b4b88f5");
+        capabilities.setCapability("deviceName", "Udi Dagan's iPod");
+        capabilities.setCapability("app", "com.liveperson.sample.udi.demoApp");
+
+
+
+        //capabilities.setCapability("deviceName", "iPhone 4s");
+        //capabilities.setCapability("app", "/Users/udid/Library/Developer/Xcode/DerivedData/helloWorld-btdbulvfchgwqbhicvxcmlfyvdnk/Build/Products/Debug-iphonesimulator/helloWorld.app");
+        driver = new AppiumDriver(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
     }
 
     @After
@@ -81,17 +91,43 @@ public class SimpleTest {
 
     @Test
     public void testUIComputation() throws Exception {
-        // populate text fields with values
-        populate();
-        // trigger computation by using the button
-        WebElement button = driver.findElement(By.className("UIAButton"));
-        button.click();
-        // is sum equal ?
-        WebElement texts = driver.findElement(By.className("UIAStaticText"));
-        assertEquals(String.valueOf(values.get(0) + values.get(1)), texts.getText());
+        for (int i=0;i<3;i++){
+            driver.findElement(By.name("Press Here")).click();
+        }
+        List<WebElement> buttons = driver.findElements(By.className("UIAButton"));
+        List<WebElement> textFields = driver.findElements(By.className("UIATextField"));
+        logElements(buttons);
+
+
+        String pageSource = driver.getPageSource();
+        System.out.println(pageSource);
+
+
+
+        driver.findElement(By.name("Live Chat")).click();
+        driver.findElement(By.name("Next")).click();
+        driver.findElement(By.name("T")).click();
+        driver.findElement(By.name("Done")).click();
+        driver.findElement(By.name("Chat Entry")).sendKeys("Hi");
+
+        //List<WebElement> el = driver.findElements(By.className("*"));
+        List<WebElement> allFormChildElements = driver.findElements(By.xpath("*"));
+        driver.findElement(By.xpath("Send")).click();
+
+        Thread.sleep(10000);
+
     }
 
-    @Test
+    private void  logElements (List<WebElement> webElementList){
+        webElementList.forEach(this::logElement);
+    }
+
+    private void logElement (WebElement we){
+        System.out.printf("Found new elements:\n");
+        System.out.printf("Name: "+we.getAttribute("name")+"\n");
+    }
+
+    //@Test
     public void testActive() throws Exception {
         WebElement text = driver.findElement(By.xpath("//UIATextField[1]"));
         assertTrue(text.isDisplayed());
@@ -100,7 +136,7 @@ public class SimpleTest {
         assertTrue(button.isDisplayed());
     }
 
-    @Test
+    //@Test
     public void testBasicAlert() throws Exception {
         driver.findElement(By.xpath("//UIAButton[2]")).click();
 
@@ -110,13 +146,13 @@ public class SimpleTest {
         alert.accept();
     }
 
-    @Test
+    //@Test
     public void testBasicButton() throws Exception {
         WebElement button = driver.findElement(By.xpath("//UIAButton[1]"));
         assertEquals("ComputeSumButton", button.getText());
     }
 
-    @Test
+    //@Test
     public void testClear() throws Exception {
         WebElement text = driver.findElement(By.xpath("//UIATextField[1]"));
         text.sendKeys("12");
@@ -125,7 +161,7 @@ public class SimpleTest {
         assertEquals("", text.getText());
     }
 
-    @Test
+    //@Test
     public void testHideKeyboard() throws Exception {
         driver.findElement(By.xpath("//UIATextField[1]")).sendKeys("12");
 
@@ -135,7 +171,7 @@ public class SimpleTest {
         button.click();
     }
 
-    @Test
+    //@Test
     public void testFindElementByClassName() throws Exception {
         Random random = new Random();
 
@@ -150,7 +186,7 @@ public class SimpleTest {
         assertEquals(String.valueOf(number), sumLabel.getText());
     }
 
-    @Test
+    //@Test
     public void testFindElementsByClassName() throws Exception {
       Random random = new Random();
 
@@ -165,7 +201,7 @@ public class SimpleTest {
       assertEquals(String.valueOf(number), sumLabel.getText());
     }
 
-    @Test
+    //@Test
     public void testAttribute() throws Exception {
         Random random = new Random();
 
@@ -179,7 +215,7 @@ public class SimpleTest {
         assertEquals(String.valueOf(number), text.getAttribute("value"));
     }
 
-    @Test
+    //@Test
     public void testSlider() throws Exception {
         //get the slider
         WebElement slider = driver.findElement(By.xpath("//UIASlider[1]"));
@@ -190,7 +226,7 @@ public class SimpleTest {
         assertEquals("0%", slider.getAttribute("value"));
     }
 
-    @Test
+    //@Test
     public void testLocation() throws Exception {
         WebElement button = driver.findElement(By.xpath("//UIAButton[1]"));
 
@@ -200,7 +236,7 @@ public class SimpleTest {
         assertEquals(122, location.getY());
     }
 
-    @Test
+    //@Test
     public void testSessions() throws Exception {
         HttpGet request = new HttpGet("http://localhost:4723/wd/hub/sessions");
         HttpClient httpClient = new DefaultHttpClient();
@@ -212,7 +248,7 @@ public class SimpleTest {
         assertEquals(jsonObject.get("sessionId"), sessionId);
     }
 
-    @Test
+    //@Test
     public void testSize() {
         Dimension text1 = driver.findElement(By.xpath("//UIATextField[1]")).getSize();
         Dimension text2 = driver.findElement(By.xpath("//UIATextField[2]")).getSize();
