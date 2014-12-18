@@ -1,5 +1,6 @@
 package com.saucelabs.appium;
 
+import com.oracle.javafx.jmx.json.JSONException;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import org.apache.http.HttpEntity;
@@ -8,24 +9,23 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.XML;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.*;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.SystemClock;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -53,16 +53,17 @@ public class SimpleTest {
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("platformVersion", "7.1");
 
-        capabilities.setCapability("udid","becfbcdc585a8d9089c7061a43b4054b7b4b88f5");
-        capabilities.setCapability("deviceName", "Udi Dagan's iPod");
+        //capabilities.setCapability("udid","becfbcdc585a8d9089c7061a43b4054b7b4b88f5");
+        //capabilities.setCapability("deviceName", "Udi Dagan's iPod");
         capabilities.setCapability("app", "com.liveperson.sample.udi.demoApp");
 
 
 
-        //capabilities.setCapability("deviceName", "iPhone 4s");
+        capabilities.setCapability("deviceName", "iPhone 5s");
+        capabilities.setCapability("app", "/Users/udid/Library/Developer/Xcode/DerivedData/EcoSmart-cusbojosskpxlidyhpenbproiwri/Build/Products/Debug-iphonesimulator/EcoSmart.app");
         //capabilities.setCapability("app", "/Users/udid/Library/Developer/Xcode/DerivedData/helloWorld-btdbulvfchgwqbhicvxcmlfyvdnk/Build/Products/Debug-iphonesimulator/helloWorld.app");
         driver = new AppiumDriver(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 
     }
 
@@ -89,33 +90,126 @@ public class SimpleTest {
       return new Point(upperLeft.getX() + dimensions.getWidth()/2, upperLeft.getY() + dimensions.getHeight()/2);
     }
 
+
+
     @Test
-    public void testUIComputation() throws Exception {
-        for (int i=0;i<3;i++){
-            driver.findElement(By.name("Press Here")).click();
+    public void testUIComputationEcoSmart() throws Exception {
+
+
+        try{
+            driver.switchTo().alert().accept();
+        }catch (Exception e){
+            System.out.println("Alert wasn't found");
         }
+
+        try{
+            driver.switchTo().alert().accept();
+        }catch (Exception e){
+            System.out.println("Alert wasn't found");
+        }
+        //Settings page:
+        driver.findElement(By.name("ESFMasterViewController.settingsButton")).click();
+        driver.findElement(By.name("Staging")).click();
+            //Type account no'
+        WebElement webElement = driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAImage[1]/UIATextField[1]"));
+        logElement(webElement);
+        if (!webElement.getText().equals("43244280")){
+
+            webElement.sendKeys("43244280");
+        }
+
+            //Type skill
+        webElement = driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAImage[2]/UIATextField[1]"));
+        logElement(webElement);
+        if (!webElement.getText().equals("mobile")) {
+            webElement.sendKeys("mobile");
+        }
+            //Save and relaunch visit
+        driver.findElement(By.name("ESFSettingsViewController.saveButton")).click();
+
+        //Enter product page
+        driver.findElement(By.name("ZETA")).click();
+
+        //Contact A Representitive Button - Start Chat
+        driver.findElement(By.name("ESFDetailViewController.helpButton")).click();
+        driver.findElement(By.name("Next")).click();
+
+        //Write your name
+        webElement = driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[2]/UIAScrollView[1]/UIAScrollView[2]/UIATextField[1]"));
+        logElement(webElement);
+        if (webElement.getText().equals("")){
+            webElement.sendKeys("Test User");
+        }
+        //Go Next
+        webElement = driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[3]/UIAKeyboard[1]/UIAButton[4]"));
+        webElement.click();
+
+
+        //Go next
+        webElement = driver.findElement(By.name("Done"));
+        webElement.click();
+
+        driver.findElement(By.name("Chat Entry")).sendKeys("Hello");
+        driver.findElement(By.name("Send")).click();
+        //driver.findElement(By.name("Chat Entry")).sendKeys("I would like to get some ");
+        //driver.findElement(By.name("Chat Entry")).sendKeys("information about ZETA");
+        //driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[2]/UIAButton[3]")).click();
+        Thread.sleep(2000);
+        driver.findElement(By.name("Chat Entry")).sendKeys("You are repeating yourself..");
+        driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[2]/UIAButton[3]")).sendKeys("what??");
+        driver.findElement(By.name("Menu")).click();
+        driver.findElement(By.name("End Session")).click();
+        Alert alert = driver.switchTo().alert();
+        alert.accept();
+        printAllElements();
+
+        //driver.swipe(300,200,120,200,1);
+        //driver.switchTo().activeElement();
+        driver.findElement(By.xpath("//UIAApplication[1]/UIAWindow[2]/UIAScrollView[1]/UIAScrollView[1]/UIAButton[6]")).click();
+        driver.findElement(By.name("Yes")).click();
+
+
+
+        Thread.sleep(10000);
+
+    }
+
+
+
+    //@Test
+    public void testUIComputation() throws Exception {
+        //for (int i=0;i<3;i++){
+            driver.findElement(By.name("Press Here")).click();
+        //}
         List<WebElement> buttons = driver.findElements(By.className("UIAButton"));
         List<WebElement> textFields = driver.findElements(By.className("UIATextField"));
         logElements(buttons);
 
 
-        String pageSource = driver.getPageSource();
-        System.out.println(pageSource);
-
-
-
         driver.findElement(By.name("Live Chat")).click();
         driver.findElement(By.name("Next")).click();
-        driver.findElement(By.name("T")).click();
+        logElement(driver.findElement(By.xpath("//UIAApplication/UIAWindow[2]/UIAElement")));
+
         driver.findElement(By.name("Done")).click();
         driver.findElement(By.name("Chat Entry")).sendKeys("Hi");
 
-        //List<WebElement> el = driver.findElements(By.className("*"));
-        List<WebElement> allFormChildElements = driver.findElements(By.xpath("*"));
         driver.findElement(By.xpath("Send")).click();
 
         Thread.sleep(10000);
 
+    }
+
+    private void printAllElements (){
+        System.out.println("Printing all elements");
+        String pageSource = driver.getPageSource();
+        System.out.println(pageSource);
+        try {
+            org.json.JSONObject xmlJSONObj = XML.toJSONObject(pageSource);
+            String jsonPrettyPrintString = xmlJSONObj.toString(4);
+            System.out.println(jsonPrettyPrintString);
+        } catch (JSONException je) {
+            System.out.println(je.toString());
+        }
     }
 
     private void  logElements (List<WebElement> webElementList){
@@ -123,8 +217,8 @@ public class SimpleTest {
     }
 
     private void logElement (WebElement we){
-        System.out.printf("Found new elements:\n");
-        System.out.printf("Name: "+we.getAttribute("name")+"\n");
+        System.out.printf("Found new element:\n");
+        System.out.printf("Name: " + we.getAttribute("name") + "\n");
     }
 
     //@Test
