@@ -53,15 +53,20 @@ public class SimpleTest {
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("platformVersion", "7.1");
 
+        //Real Device
         //capabilities.setCapability("udid","becfbcdc585a8d9089c7061a43b4054b7b4b88f5");
         //capabilities.setCapability("deviceName", "Udi Dagan's iPod");
         capabilities.setCapability("app", "com.liveperson.sample.udi.demoApp");
 
 
-
+        //iOS Simulator
         capabilities.setCapability("deviceName", "iPhone 5s");
         capabilities.setCapability("app", "/Users/udid/Library/Developer/Xcode/DerivedData/EcoSmart-cusbojosskpxlidyhpenbproiwri/Build/Products/Debug-iphonesimulator/EcoSmart.app");
+
+        //SampleApp Demo
         //capabilities.setCapability("app", "/Users/udid/Library/Developer/Xcode/DerivedData/helloWorld-btdbulvfchgwqbhicvxcmlfyvdnk/Build/Products/Debug-iphonesimulator/helloWorld.app");
+
+
         driver = new AppiumDriver(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 
